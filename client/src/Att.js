@@ -49,11 +49,15 @@ function savefile( wb) // 서버에서 넘어온 객체를 가지고 엑셀을 �
 
 
 class Att extends React.Component {
+
+  
    saveText()
   {
     axios.get('http://localhost:5000/save')
     .then(response => {console.log(response)})
   }
+
+
   state = {file : null}
 fileHandler = (e) => {
 	const files = e.target.files[0];

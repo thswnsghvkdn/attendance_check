@@ -11,9 +11,16 @@ app.use(cors())
 const month = new Date().getMonth() 
 const week = parseInt(new Date().getDate() / 7)
 
-
 app.use(bodyparser.json())
+app.use(express.static(path.join(__dirname , 'client/build')))
 
+const path = require('path')
+
+app.get('*', (req,res) =>{
+    res.sendFile(path.join(__dirname + '/client/build/index.html'))
+})
+
+console.log('server running')
 
 var conn = mysql.createConnection({
     host : 'localhost' ,
@@ -68,6 +75,8 @@ function call_make()
 
 var students = '준호 채윤 훈모'
 var new_stu = students.split(' ')
+
+
 
 
 

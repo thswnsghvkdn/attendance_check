@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "backend" : "nodemon server.js",
-    "start": "concurrently \"npm run backend\" \"npm run start --prefix client\" "
+    "start": "concurrently \"npm run backend\" \"npm run start --prefix client\" ",
+    "heroku-postbuild" : "cd client && npm install && npm run build"
   },
   "repository": {
     "type": "git",
