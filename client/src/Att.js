@@ -1,6 +1,6 @@
 import React from 'react'
 import Excel from 'exceljs'
-
+import axios from 'axios'
 
 
 // var data = wb.worksheets[2].columns[15].values
@@ -14,40 +14,47 @@ import Excel from 'exceljs'
 }
 */
 
-
+/*
+var res ={ att:
+  [ [ 1, null, 1, 1 ],
+    [ null, 1, null, 1 ],
+    [ null, null, 1, 1 ],
+    [ 1, null, 1, 1 ],
+    [ null, 1, null, 1 ],
+    [ 1, null, 1, 1 ] ],
+ date: [ '2-1', '2-0', '1-3', '1-2', '1-1', '1-0' ] };
+*/
 
 
 function savefile( wb) // 서버에서 넘어온 객체를 가지고 엑셀을 수정 
 {
   var res ={ att:
     [ [ 1, null, 1, 1 ],
-      [ null, 1, null, 1 ],
-      [ null, null, 1, 1 ],
-      [ 1, null, 1, 1 ],
-      [ null, 1, null, 1 ],
-      [ 1, null, 1, 1 ] ],
-   date: [ '2-1', '2-0', '1-3', '1-2', '1-1', '1-0' ] };
-    for(var i = 0 ; i < res.date.length ; i++)
+    [ null, 1, null, 1 ]],
+   date: [ '2-1' , '2-0'] };
+   debugger;
+    for(var i = 0 ; i < res.att.length ; i++)
     {
-        var date = res.date[i]; // '2-1' 과 같이 월과 주가 객체로 전달된다.
-        var m = Number(date[0])
-        var c = Number(date[2])
-        for(var j = 0 ; j < res.att.length ; j++){
-            {
-                for(var k = 0 ; k < res.att[j].length ; k++){
-                    if(res.att[j][k] === 1){
-                      wb.worksheets[m + 2].getRow(5 + k).getCell(16 + c).value = 1;
-                      debugger;
-                     }
-                }
-            }
+        var _date = res.date[i]; // '2-1' 과 같이 월과 주가 객체로 전달된다.
+        var m = Number(_date[0]) // sheet 과 cell을 찾기 위해 date 문자열 파싱
+        var c = Number(_date[2])
+        for(var j = 0 ; j < res.att[i].length ; j++) // 출석정보를 담은 배열에서 한명한명의 출석유무를 판별
+        {
+            if(res.att[i][j] === 1){ // 출석을 의미하는 1이면 엑셀에 체크
+              wb.worksheets[m + 1].getRow(5 + j).getCell(16 + c).value = 1;
+              }
         }
     }
 }
 
 
 class Att extends React.Component {
-state = {file : null}
+   saveText()
+  {
+    axios.get('http://localhost:5000/save')
+    .then(response => {console.log(response)})
+  }
+  state = {file : null}
 fileHandler = (e) => {
 	const files = e.target.files[0];
   	this.setState({
@@ -87,6 +94,7 @@ fileHandler = (e) => {
       <div className="Att">
         <input type="file" multiple onChange={this.fileHandler}/>
         <input type = "date" id = "myDate" multiple onChage={this.date} />
+        <input type = "button" onClick = {this.saveText} />
       </div>
     );
   }

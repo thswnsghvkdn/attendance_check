@@ -5,11 +5,12 @@ const bodyparser = require('body-parser')
 const excel = require('exceljs')
 const dbuser = require('./config')
 const cell = 5
+var cors  = require('cors')
+app.use(cors())
 
 const month = new Date().getMonth() 
 const week = parseInt(new Date().getDate() / 7)
 
-var obj = {att : [] , date : []}
 
 app.use(bodyparser.json())
 
@@ -26,38 +27,40 @@ conn.connect( (err) =>{
         console.log(err)
     else {
         console.log('DB connected')
-        tt()
+        call_make()
     }
 })
 
-function recursive(m , w)
-{
+var obj = {att : [] , date : []}
 
-    var _date =   m + '-' + w ;
-    var str = 'select `'+ _date + '` from attendance'
+function make_obj(m , w)
+{
+    var _date =   m + '-' + w ; // 월 - 주차 
+    var str = 'select `'+ _date + '` from attendance' // 해당 컬럼 전체를 가져오기 위한 명령문
     conn.query(str ,function(err, result){
         if(result) {
             var t = []
-            for(var j = 0 ; j < result.length ; j++)
+            for(var j = 0 ; j < result.length ; j++) // json 객체에서 출석정보만을 가져온다.
                 t.push(result[j][_date])
-            obj.att.push(t)
-            obj.date.push(_date)
-            if(m == 1 && w == 0) console.log(obj)
+            obj.att.push(t) // 출석정보 배열을 객체에 att 에 push 한다.
+            obj.date.push(_date) // 해당 날짜를 push한다.
+
+            if(m == 1 && w == 0) console.log(obj) // 1월 0주차에 경우 출력한다.
         }
     })
 }
 
-function tt()
+function call_make()
 {
     m = month + 1;
     w = week * 2 + 1;
-    while(m >= 1)
+    while(m >= 1) // 1월 까지 줄여가며 반복한다
     {
-        recursive(m , w, obj)
+        make_obj(m , w) // str을 만들기위한 주차와 월을 변경해가며 함수를 호출한다.
         w--;
-        if(w < 0)
+        if(w < 0) // 0주차 이전으로 갈 경우 이전 달로 보내기
         {
-            m--;
+            m--; // 월 감소
             w = 9;
         }
     }
@@ -66,64 +69,8 @@ function tt()
 var students = '준호 채윤 훈모'
 var new_stu = students.split(' ')
 
-function att() {
-    for( var i in new_stu){
-        var str = 'select * from attendance where name like' + conn.escape('%' + new_stu[i] +'%')
-        conn.query(str , function(err, result){
-            if(err) ( err => console.log(err))
-            if(result.length >= 1) {
-                var s = '01'
-                var c = 1
-                var index = year + '-' + 1 + '-' + 1
-                console.log(index)
-                console.log(result[2][index])
-            }
-        })
-    }
-}
 
-function get_column(){
-    var str = 'select name from attendance'
-    conn.query(str, function(err, result){
-        debugger;
-        console.log(result)
-        console.log(result[0].name)
-        
-    })
-}
 
-function save() {
-
-    debugger;
-    var m = month + 2; // worksheet 번호
-    var w = week * 2 + 1;
-    var att = []
-    var date = []
-    while( m <= 1 ) {
-        var _date = '`' +  m + '-' + w + '`';
-        var str = 'select '+ _date +' from attendance'
-        console.log(str)
-        conn.query(str , function(err, result){
-            if(result) {
-                console.log(result)
-                if(err) ( err => console.log(err))
-                att.push(result[_date])
-            }
-        })
-        // 다음 컬럼을 받는다. 
-        w--;
-        if(w < 0) // 이전 달로 이동
-        {
-            w = 9;
-            m--
-        }
-        date.push(_date)
-    }
-    console.log({ att : att , date : date});
-    debugger;
-    return({ att : att , date : date});
-    
-}
 app.post('/attendance' , (req, res) => {
     //var students = req.body.students;
 
@@ -140,31 +87,9 @@ app.post('/attendance' , (req, res) => {
 })
 
 app.get('/save', (req, res) =>{
-    var m = month + 2; // worksheet 번호
-    var w = week * 2 + 1;
-    var att = []
-    var date = []
-    while( m <= 1 ) {
-        var _date = '`' +  m + '-' + w + '`';
-        var str = 'select '+ _date +' from attendance'
-        conn.query(str , function(err, result){
-            if(result) {
-                if(err) ( err => console.log(err))
-                att.push(result[_date])
-            }
-        })
-        // 다음 컬럼을 받는다. 
-        w--;
-        if(w < 0) // 이전 달로 이동
-        {
-            w = 9;
-            m--
-        }
-        date.push(_date)
-    }
-    res.send({ att : att , date : date});
+    res.send("hello");
 })
 
 
 
-app.listen(3000, () => console.log('sever is running at port no 3000'));
+app.listen(5000, () => console.log('sever is running at port no 3000'));
