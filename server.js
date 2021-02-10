@@ -11,10 +11,14 @@ app.use(cors())
 const month = new Date().getMonth() 
 const week = parseInt(new Date().getDate() / 7)
 
+
+
 app.use(bodyparser.json())
-app.use(express.static(path.join(__dirname , 'client/build')))
 
 const path = require('path')
+
+var favicon = require('serve-favicon');
+app.use(favicon(path.join(__dirname , '/client/public/' , 'sheep.jpg')))
 
 app.get('*', (req,res) =>{
     res.sendFile(path.join(__dirname + '/client/build/index.html'))
