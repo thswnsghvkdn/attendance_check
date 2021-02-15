@@ -53,7 +53,7 @@ class Att extends React.Component {
   
    saveText()
   {
-    axios.get('http://localhost:5000/save')
+    axios.get('/save')
     .then(response => {console.log(response)})
   }
 
